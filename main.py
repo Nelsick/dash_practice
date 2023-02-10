@@ -20,7 +20,10 @@ app.layout = html.Div([
                 html.H1("Hotel Reservations", className='side_bar_title'),
                 html.Label("Año de análisis", className='side_bar_dropdown_label'),
                 html.Div(
-                    dcc.Dropdown(df.arrival_year.unique(),id='year_dropdown')
+                    dcc.Dropdown(df.arrival_year.unique(),
+                    multi=True,
+                    value=[],
+                    id='year_dropdown')
                 ),
                 html.Label("Tipo de comida",className='side_bar_dropdown_label'),
                 dcc.Dropdown(df.type_of_meal_plan.unique(),id='meal_dropdown'),
@@ -53,9 +56,15 @@ app.layout = html.Div([
                     className="Container_2"
                 ),
                 html.Div(
-                    dcc.Graph(id = 'booking_total_line', figure = {}),
-                    className="Container_3"
-                )
+                    className="Container_3",
+                    children=[
+                        html.P("Reservas por año"),
+                        dcc.Graph(
+                            id = 'booking_total_line', 
+                            config={'displayModeBar':False},
+                            className="Container_3_graph" 
+                        ),
+                ])
             ])
     ])
 
@@ -66,7 +75,7 @@ app.layout = html.Div([
     [Input('year_dropdown',component_property='value')])
 
 def update_graph(value):
-    data = booking_year[booking_year['arrival_year'] == value]
+    data = booking_year[booking_year['arrival_year'].isin(value)]
     fig = px.line(
         data_frame=data,
         x='arrival_month',
